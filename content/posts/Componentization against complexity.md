@@ -1,7 +1,7 @@
 ---
 title: "Componentization against complexity"
 date: 2017-07-01
-lastmod: 2018-01-12
+lastmod: 2018-02-21
 draft: false
 tags: ["functional programming", "reactive programming", "components"]
 categories: ["programming"]
@@ -16,7 +16,7 @@ We have [previously](/posts/user-interfaces-as-reactive-systems/) seen that a re
 
 Complexity resists to a uniformally useful definition. However, it is generally accepted that there is a component of complexity which cannot be reduced by any particular technique. <em>How many systems do we have? In what convoluted manner are they connected? What the requirement for operating these systems? How many parameters or subtasks are necessary to specify a task?</em>. That complexity increases every year, as the trend is into interconnecting more and more systems to satisfy ever astringent user requirements to do more things in less time. To reuse a commonly used term, we will call this the essential complexity of the system under specification.
 
-Oddly enough, at the same time, on a subjective level, things that were complex last year are less complex now. That subjective but very real component of complexity relates the number of things that cause problems to our ability to deal with them. Our ability to deal with them goes up as we develop better languages, tools, interfaces, architecture, infrastracture, etc. and are able to do more with less. We would define this component of complexity as accidental complexity, and as being the complexity that an implementation approach adds to the essential complexity corresponding to the specification of a system.
+Oddly enough, at the same time, on a subjective level, things that were complex last year are less complex now. That subjective but very real component of complexity relates the number of things that cause problems to our ability to deal with them. Our ability to deal with them goes up as we develop better languages, tools, interfaces, architecture, infrastructure, etc. and are able to do more with less. We would define this component of complexity as accidental complexity, and as being the complexity that an **implementation approach** adds to the essential complexity corresponding to the **specification** of a system.
 
 As a side note, a user interface itself is precisely an attempt at shielding the user from the complexity of underlying systems so he can focus on the domain at hand and the tasks it encompasses. In other words, the user interface **abstracts** out the underlying system layer. As a matter of fact, most advances against accidental complexity (in **any** field) are made by better and/or more powerful abstractions.
 
@@ -49,7 +49,7 @@ The effort spent in identifying and delineating the invariants from the variants
 
 ![Component framework](https://www.clear.rice.edu/comp310/JavaResources/frameworks/frameworks.png)
 
-Hence, in essence, component frameworks break the system down into variant "components" that represent abstract processing that the system supports. These components are generally thought of as "pluggable" in the sense that the system can be configured with a set of components to accomplish a particular task or set of tasks.   In many systems, the components can dynamically swapped in and out.   The framework, on the other hand, is the invariant "superstructure" that manages the components, providing services to each component that, when combined with the services/behaviors supplied by that component, create the net behavior defined by that component in that framework.    The framework has the effect of decoupling or isolating the components **from each other** while coupling them to the framework.
+Hence, in essence, component frameworks break the system down into variant "components" that represent abstract processing that the system supports. These components are generally thought of as "pluggable" in the sense that the system can be configured with a set of components to accomplish a particular task or set of tasks.   In many systems, the components can be dynamically swapped in and out.   The framework, on the other hand, is the invariant "superstructure" that manages the components, providing services to each component that, when combined with the services/behaviors supplied by that component, create the net behavior defined by that component in that framework.    The framework has the effect of decoupling or isolating the components **from each other** while coupling them to the framework.
 
 # Benefits
 As previously mentioned, the benefits are :
@@ -101,7 +101,8 @@ state.
 ## Conflicting world views
 Components are tied to a component framework, which defines its interface and lifecycle, by thus limiting the scope of their reuse out of that framework. Adapters and bridges can be built to palliate that situation. However that is not always possible or practical.
 
-As a matter of fact, Angular2 components cannot be reused out of Angular2, React components can be adapted to React-like frameworks but it takes some efforts, etc. Web components, which are supposed to be a common standard, allowing reuse in all browsers, have been arriving for many years, and are still a work in progress, illustrating the difficulty of designing simultaneously for many targets.
+As a matter of fact, Angular2 components can hardly be reused out of Angular2, React components 
+can be adapted to React-like frameworks but it takes some efforts, etc. Web components, which are supposed to be a common standard, allowing reuse in all browsers, have been arriving for many years, and are still a work in progress, illustrating the difficulty of designing simultaneously for many targets.
 
 ## Componentization is a strategic decision
 The option of componentization to implement a reactive system, must, like any architectural decision, be weighted in the context of the specific implementing company/project/team. A start-up who will anyways trash its minimum viable product the next year after receiving funding  might prefer to avoid going through the trouble, while companies which are constantly developing software might want to invest in carefully designed components.

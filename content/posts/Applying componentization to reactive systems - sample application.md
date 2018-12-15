@@ -1,7 +1,7 @@
 ---
 title: "Applying componentization to reactive systems : sample application"
 date: 2017-10-16
-lastmod: 2018-01-06
+lastmod: 2018-02-21
 draft: false
 tags: ["functional programming", "reactive programming", "components"]
 categories: ["programming"]
@@ -265,7 +265,7 @@ For the full code and running demo, see [here](https://github.com/brucou/compone
 
 This example allows us to illustrate an important componentization tip. 
 
-## TIP : What makes a good breakdown
+## **Tip** : What makes a good breakdown
 What makes this breakdown a good one? Independence or loose coupling is the key here :
 
 - `MainPanel` can be implemented fairly independently from `SidePanel`

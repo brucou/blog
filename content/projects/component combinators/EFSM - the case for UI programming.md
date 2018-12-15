@@ -1,7 +1,7 @@
 ---
 title: "The case for state machines in UI programming"
 date: 2017-06-15
-lastmod: 2018-02-17
+lastmod: 2018-02-25
 draft: false
 tags: ["functional programming", "reactive programming", "user interface"]
 categories: ["documentation", "programming"]
@@ -83,7 +83,7 @@ For practical purposes, the set of traces being generally infinite, gray-box tes
 ## ... but stream-based implementations often obfuscate the user interface design
 However, the functional reactive programming with streams approach suffers from two key issues:
 
-- linear, one-way dataflows are expressed easily through combining higher-order stream operators (`map`, `flatMap`), simple control flow is made possible by specific operators (`filter`, `switch`, `fold`), but complex control flow often requires ad-hoc solutions(jumping, interrupts, conditional branching, looping, etc.)
+- linear, one-way dataflows are expressed easily through combining higher-order stream operators (`map`, `flatMap`), simple control flow is made possible by specific operators (`filter`, `switch`, `fold`), but complex control flow(jumping, interrupts, conditional branching, looping, etc.) often requires ad-hoc solutions
 - streams operators are generally pure functions, hence any desired state must be passed explicitly throughout all the relevant part of the operator chain, and changes to that state must be propagated explicitly at a given point of the operator chain
 
 In short, in the case of wireframe flows featuring complex control flow, the design cannot be easily and automatically reconstructed from the reactive implementation, as the control flow cannot be easily separated from other implementation concerns (state passing 
@@ -107,6 +107,7 @@ Finite state machines model behavior where responses to future events depend upo
 - *Actions* taken during transitions
 
 An extended state machines adds : 
+
 - *Guards* which are predicates which enable a transition when satisfied
 - *Variables* that hold values needed by actions and guards between events. The set of those variables is referred to as *model*.
 
@@ -144,30 +145,27 @@ Written with streams, the equation becomes `actions = f(events, states, initialM
 Let's see how extended state machines help alleviate the previously mentioned pain points of reactive systems design and implementation.
 
 ### Design, implementation, test and communication
-We have seen that transitions between states hence allow to express complex control flow with a simple vocabulary : state, transitions, guards. State machines are in fact akin to domain-specific languages, where inputs are events, (reactive) sub-routines are transitions, variables are the model, assignments are model updates, branching constructs are control states and guards, the actions being the output of the program.
-The combination of dataflow (streams) and DSL-controlled flow allow to express a reactive design into an implementation with reasonable ease.
-
-More importantly, the control flow is encoded in a regular object which can be automatically parsed in many ways of interest.
+We have seen that transitions between states hence allow to express complex control flow with a simple vocabulary : state, transitions, guards. More importantly, the control flow is encoded in a regular object which can be automatically parsed in many ways of interest.
 
 Among key examples, the state machine definition (`:: Record {transitions, eventNames, states, initialModel, initialEvent}`) can be :
 
 - used by `f` to compute the actions from the events, i.e to produce an executable version of the state machine
 - automatically parsed into a graphical representation of all or a slice of the behaviour (removing error handling flows for instance) of the state machine
-- used to generate automatic tests for the state machine (note that this requires additional formalization (refinement of the DSL), more on this in a future section)
+- used to generate automatic tests for the state machine 
 
 Going back to the [sample application](https://github.com/brucou/component-combinators/tree/master/examples/volunteerApplication), here is an example of automatizable flow graph, in which the error flows have been segregated :
 
 ![(Automatically generated flow graph)](https://i.imgur.com/dkbSwEw.png "Automatically generated flow graph")
 
 It becomes apparent that the state machine representation closely matches and refines the wireframe 
-flows obtained from the design phase. This shows how the systematic way to translate a reactive design into an implementation that is a state machine minimizes implementation bugs, by sticking to the design.
+flows obtained from the design phase (represented in green). This shows how the systematic way to translate a reactive design into an implementation that is a state machine minimizes implementation bugs, by sticking to the design.
 
 Design bugs themselves can be reduced (discrepancy between the produced design and the desired specification), as we mentioned before, via rapid prototyping, user feedback and iterating on the design.
 
 Generative testing can be used to increase the test process automatization, reduce test implementation time, and increase confidence in the behaviour of the system.
 
 Last but not least, [readability](https://en.wikipedia.org/wiki/Computer_programming#Readability_of_source_code) refers to the ease with which a human reader can 
-comprehend the purpose, control flow, and operation of source code. A state-machine-based DSL goes a long way in communicating the intent and meaning of a reactive program.
+comprehend the purpose, control flow, and operation of source code. A state-machine-based design goes a long way in communicating the intent and meaning of a reactive program.
 
 ### Asynchrony and concurrency
 All state machine formalisms, universally assume that a state machine completes processing of each event before it can start processing the next event. This model of execution is called run to completion, or RTC.
@@ -195,7 +193,7 @@ Incremental design changes which result in changes in the model (for example add
 #### Multiple type of changes
 One can argue that incremental design changes which affect the whole state (control state and model) are not incremental. They often reflect either a poor state machine design (which does not stick closely enough to the reactive system design) or a significant change in the reactive system behaviour. 
 
-#### Conclusion
+#### Summary
 Those issues are naturally compounded by the number of states and transitions of the state machines, i.e. the complexity of the control flow that is implemented. 
 
 I however empirically found that carefully designing in a context of low-complexity control flow 

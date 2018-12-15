@@ -61,7 +61,8 @@ Settings must be an object, and can be empty (`{}`).
  not permitted
 
 # Examples
-Some examples for the `m` component factory are valid, as `Combine(settings, componentTree)` is 
+- [demo](https://github.com/brucou/component-combinators/tree/master/examples/CombineDemo)
+- some examples for the `m` component factory are valid, as `Combine(settings, componentTree)` is 
 just `m({}, settings, componentTree)`.
 
 # Tips

@@ -1,7 +1,7 @@
 ---
 title: "Default merge functions and slotted content"
 date: 2017-09-20
-lastmod: 2018-02-18
+lastmod: 2018-04-16
 draft: false
 tags: ["functional programming", "reactive programming", "user interface"]
 categories: ["documentation", "programming"]
@@ -12,10 +12,10 @@ mathjax: true
 ---
 
 # Motivation
-We want in this section to describe the default merge functions used by the `m` component 
-factory when no such merge function is supplied by the user, and the `Combine` component 
-combinator. As a matter of fact, the following content will focus on `m`, as `Combine(settings, 
-componentTree)` is just `m({}, settings, componentTree`, i.e. the result of partially applying 
+We want in this section to describe the default merge functions used by the `m` component
+factory when no such merge function is supplied by the user, and the `Combine` component
+combinator. As a matter of fact, the following content will focus on `m`, as `Combine(settings,
+componentTree)` is just `m({}, settings, componentTree`, i.e. the result of partially applying
 `m` with no combinator/merge specifications.
 
 ## DOM merge
@@ -36,7 +36,7 @@ Let's consider `m({}, {}, [ContainerComponent, [SiblingComponent1, SiblingCompon
 
 ```html
 <div id='#parent'>
-  <h2> This is some content included in the container component's DOM 
+  <h2> This is some content included in the container component's DOM
   </h2>
 </div>
 ```
@@ -60,7 +60,7 @@ Let's consider `m({}, {}, [ContainerComponent, [SiblingComponent1, SiblingCompon
 The merged result will be similar to :
 ```html
 <div id='#parent'>
-  <h2> This is some content included in the container component's DOM 
+  <h2> This is some content included in the container component's DOM
   </h2>
   <div id='#sibling1'>
     <span> first sibling component's DOM </span>
@@ -183,12 +183,12 @@ The merged DOM should hence be :
 ```
 
 In short, the general case is that the container defines some slots by name, and replace those slots
- by the corresponding DOM content found in the children DOM's slots. In this example, all slots are filled, as they can all be found in the children DOMs. 
+ by the corresponding DOM content found in the children DOM's slots. In this example, all slots are filled, as they can all be found in the children DOMs.
 
 When a slot cannot be filled in by a corresponding children DOM (the children DOM simply does not define content for that slot), the slotted content of the container is used as default. The following describes that behaviour, with the same container component, but this time children components which will not define content for the `attributes` slot.
 
 - child with slot `element-name`
- 
+
  ```html
  <span slot="element-name">template</span>
  ```
@@ -240,6 +240,8 @@ In that case, the merged DOM should be :
 ```
 
 ### Rules
+- named slots are slot to which a string is associated to, including the empty string. In 
+particular, `slot=''` is a valid **named** slot
 - there can be several children defining content for one given slot. For example, this is a valid proposition :
 
 ```html
@@ -292,20 +294,50 @@ In such a case, the children DOM's are appended one after the other. The corresp
       </slot>
     </div>
 ```
-- an <q>unnamed</q> slot can be used to enclose the children DOMs which are not assigned a slot
+- an <q>unnamed</q> slot at parent level can be used to enclose the children DOMs which are not 
+assigned a slot
 
 See same previous example as a demo of this (`<slot id="panelsSlot">`). Note that using this feature disable the standard DOM merge mechanism described previously.
 
-- Children DOM contents which are not assigned to any slot (including the unnamed slot) are merged into the parent's DOM using the mechanism described in the `Regular DOM merge` section.
+- If there is no unnamed slot used at parent level, children DOM contents which are not assigned to 
+any named slot are merged into the parent's DOM using the mechanism described in the `Regular DOM 
+merge` section.
+  - ! This means in particular that slotted children DOM contents will be lost if the parent does
+   not have the matching slots !! I decided against enforcing a contract requesting children 
+   slots to have a match at the parent site, as there might be cases when one wants to switch 
+   content on and off, based precisely on this behaviour (that said, avoid it if there are more 
+   readable alternative).
 - ~~If there's more than one unnamed or named slots, the corresponding children content will be replicated in all corresponding slots.~~
 	- ~~this is a difference with the web component slot mechanism where if there's more than one default slot, the first is used.~~
 
-### vTree transcription
-In a `vNode` context, `<slot name="attributes"><p>None</p></slot>` would correspond to `{children : [none], sel:'div', data : {slot : 'attributes'}}`, where `none` is the `vNode` corresponding to `<p>None</p>`.
+- children DOM content can **never** have three or more slots with the same name
+- children DOM content can have two slots with the same name **if and only if** the first 
+occurrence is at vNode's root level. The first slot will be marking the location of the content to 
+distribute to the parent container when the vNode is seen as a child, the second slot will mark the 
+location of the content to include when the vNode is seen as a parent container. This is a 
+special case which was made necessary when implementing tree visualization : a node in a tree 
+data structure is both a child and a parent!
+  - `{el, sel, data : {slot : MY_SLOT}, children: [{el, sel, children: [], data : {slot : 
+  MY_SLOT}}]}` is a valid `vNode`
+  - `{el, sel, data :{}, children : [{el, sel, data : {slot : MY_SLOT}, children: [{el, sel, 
+  children: [], data : {slot : MY_SLOT}}]}]}` is not a valid `vNode`
 
+### vTree transcription
+- In a `vNode` context, `<slot name="attributes"><p>None</p></slot>` would correspond to 
+`{children : [none], sel:'div', data : {slot : 'attributes'}}`, where `none` is the `vNode` corresponding to `<p>None</p>`.
+- a vNode featuring an **unnamed** slot is for instance `{..., data : {slot : undefined}, ...}` or
+ `{..., data : {}, ...}` 
+- this `{..., data : {slot : ''}}` is a valid **named** slot
 
 ### Edge cases
-cf. tests
+cf. tests.
+
+There are a number of edge cases, occurring from the complexity of slotted merge. We sum them up 
+here as a reminder :
+
+- named slot whose associated name is an empty string (to avoid, unless you have a very good reason)
+- named slots for children content, but no matching slot on parent container
+- parent container is a text vNode (to avoid as well, unless a good reason)
 
 # References
 

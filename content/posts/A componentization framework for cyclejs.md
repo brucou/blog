@@ -1,7 +1,7 @@
 ---
 title: "A componentization model for cyclejs"
 date: 2017-07-07
-lastmod: 2018-02-18
+lastmod: 2018-02-21
 draft: false
 tags: ["functional programming", "reactive programming", "components"]
 categories: ["programming"]
@@ -62,11 +62,14 @@ with same colour).
 
 ![cyclejs framework](/img/graphs/cycle_component_framework.png)
 
-In the context of this component framework, component composition is simply function composition, with message-passing/dataflow through streams and a port-based interface emulated by the monikers `SinkName`, `SourceName`. It is the simplicity of the composition 
-interface (standard function composition) which motivates renouncing the purity of the reactive 
-function.
+In the context of cyclejs, component composition can be based on standard function 
+composition, with message-passing/dataflow through streams and a port-based interface emulated by the monikers `SinkName`, `SourceName`. It is the simplicity of that interface (standard function composition) which motivates renouncing the purity
+ of the reactive function.
 
-We will review in what follows parallel composition, sequential composition, parametricity and genericity, all of which being concerns incorporated into what we term component combinators.
+In the context of our component model, component composition is performed via what we term 
+component combinators. We will review in what follows parallel composition, sequential composition, 
+parametricity and genericity, all of which being concerns incorporated into the component 
+combinators.
 
 ## Parallel composition
 Parallel composition in our context is based on expressing the reactive function $f$ as the combination of functions, each of which captures a smaller and ideally isolated part of the overall $f$'s complexity.
@@ -86,8 +89,8 @@ In short, we want a `combine :: Array<Component> -> Component`, where :
 
 Note that :
 
-- the `combine` function can take any extra arguments, in which case, by uncurrying, it is always possible to come back the canonical `combine` form shown previously.
-- As any component used to derive another component can itself have been derived, parallel composition naturally leads to the manipulation of component trees
+- the `combine` function can take any extra arguments, in which case, by partial application, it is always possible to come back the canonical `combine` form shown previously.
+- As any component used to derive another component can itself have been derived, parallel composition naturally leads to component trees
 
 There are usually many ways to perform that decomposition. The idea in every case is to reach functions $f\_{m.n...}$ whose complexity is easily manageable. If we understand that part of complexity of such functions emanates from the top-level $f$, while another part stems from the interaction of $f\_{m.n...}$s with the larger reactive system, we see that there is a sweet spot where the function is 'small' enough to be manageable but not too small so it has to be coupled with many other functions to achieve a given functionality (**coupling increases complexity**).
 
@@ -290,9 +293,10 @@ We recommend to generate the necessary pieces of state as close as possible to w
 
 ![state management](/img/graphs/state_injection.png)
 
-Note that the new pieces of state computed by the state injection combinator are **added** to 
-existing pieces of state, and can be generated from already generated pieces of state, or through 
-some factory in `Sources` (`Query` driver for instance - see yellow pills for component `D`).
+Note that the new pieces of state computed by the state injection combinators (`InjectSources`, 
+`InjectSourcesAndSettings`) are **added** to existing pieces of state, and can be generated from 
+already generated pieces of state, or through some factory in `Sources` (`Query` driver for 
+instance - see yellow pills for component `D`).
 
 ### Remotely persisted state
 This category includes whatever sits in remote databases, but also in any system of interest (for
@@ -307,7 +311,7 @@ This is a piece of state which lasts only as long as the component that created 
 place. Transient state has no need to be kept around and is recreated when needed. As an example, a 
 search-as-you-type component might keep track of the length of the search key, and perform search
  API calls only when that length has reached a minimum value. The length of the entered search key 
- would be transient state. Transient state is generally created through the stream `scan` operator.
+ would be transient state. Transient state may be created through the stream `scan` operator.
 
 ## Concurrency control
 User interfaces are inherently concurrent due to their interfacing with **distributed** systems, 

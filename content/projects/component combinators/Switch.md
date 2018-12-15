@@ -1,7 +1,7 @@
 ---
 title: "Switch"
 date: 2017-08-12
-lastmod: 2017-09-07
+lastmod: 2018-03-22
 draft: false
 tags: ["functional programming", "reactive programming", "user interface"]
 categories: ["documentation", "programming"]
@@ -97,3 +97,19 @@ Cf. [tests](https://github.com/brucou/component-combinators/blob/master/test/Swi
 - One should strive for having a relatively low number of discretized switch values as there is a performance cost which is linear with the number of such values. As a matter of fact, all predicates matching switched components to their discretized values are executed, for every incoming value of the switch source.
 - One can have several fulfilled predicates for a given incoming value of the switch source. This means that several components could be activated for a given incoming value, but different conditions, which allows to implement more complex logic. This is however to use wisely, as the ability to reason about behaviour suffers somewhat. For instance, when several components can be activated for the same incoming value, and order of activation of those component matter, such ordering requirement is essentially hidden as implementation detail in the source code.
 - One can also implement a `eqFn` such that a `Case` component is activated for a set of values instead of just one value. Alternatively, a `on` source can be computed in a way that assign a unique identifier to a given set of values. Using `eqFn` should however be more versatile, as one can specify a different `eqFn` for each `Case` component.
+- It is NOT possible to implement a `default` case by using an `eqFn` which always 
+returns true. In case no non-default case is satisfied, the behaviour would be the sought-for; 
+however, if one non-default case is satisfied, the default case will ALSO be executed, which 
+desviates from the sought-for semantics! It is however possible to have an `eqFn` which returns 
+true iff none of the other case branches'predicate is fulfilled. This however has consequences 
+for maintainability : modifying predicates for any non-default branch means one MUST update the 
+default branch predicate...
+- If no branch is fulfilled, the `Switch` DOM sink will emit an empty `<div></div>`. This serves 
+to display initial DOM content even when no case predicate has yet been matched. As a matter of 
+fact, DOM is at first an uninitialized behaviour, and the DOM merge function (i.e. `$.combineLatest
+(dom1, dom2)` blocks till **both** `dom1` and `dom2` emits their initial value). Considering for 
+instance `Combine({}, [Comp1, Switch({...}, [Case({...}, [Comp2])...])])`, the chosen semantics 
+allow to have `Comp1` displayed on first emission of the switched source, even if the value 
+emitted did not match any case predicate.
+- **NOTE TO SELF** : why not start by default every DOM sink with null??
+

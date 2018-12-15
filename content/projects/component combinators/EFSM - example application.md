@@ -62,7 +62,7 @@ application, choosing the section of the application he wants to modify. When he
 
 Other relevant information :
 
-- 90% of students are using the application on low-tech small-screen mobile.
+- 90% of volunteers are using the application on low-tech small-screen mobile.
 - All data about festival and teams is available and stored on a remote repository.
 - When the volunteers' application is finalized, the application data is saved in the remote repository.
 

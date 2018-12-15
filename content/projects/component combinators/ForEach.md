@@ -55,8 +55,9 @@ The behaviour is as follows :
 - `SettingsPropertyName :: String`
 
 ### Contracts
-- the source configured through the `from` property MUST be found as a property of the `sources` parameter.
-- there must be at least one child component
+- the source configured through the `from` property MUST be found as a property of the `sources` 
+parameter and MUST be an observable (and SHOULD be an event source)
+- there MUST be at least one child component
 
 # Example
 cf. demo and [tests](https://github.com/brucou/component-combinators/blob/master/test/ForEach.specs.js)
@@ -64,3 +65,15 @@ cf. demo and [tests](https://github.com/brucou/component-combinators/blob/master
 # Tips
 - If it is necessary to implement a logic by which the component switching should only trigger on **CHANGES** of the incoming value, that logic could be implemented with appending a `distinctUntilChanged` to the `ForEach` source.
 - For each incoming value of the source, the component is switched off and then on again. This means any non-persisted state local to the component will be reinitialized. In this case this behaviour is not desired, a turn-around is to persist the local state to retrieve it between switches.
+- The `from` source used to parameterize the `ForEach` combinator **should** be an event source 
+(i.e. not a behaviour source). It is possible however that it would still work correctly for behaviour
+  sources, but that is not tested against.
+- A common gotcha is to reuse the `from` event source used to parameterize the `ForEach` combinator
+ in the children components. The correct way to get the **current** value from the `from` source is to 
+get it from the `settings` parameter. The `from` event source when accessed by the children 
+component, will have its 'time' stepped forward, meaning that `sources[from]` in `function(sources, 
+settings)` will pass only the values emitted **after** the current value stored in settings. 
+Naturally this applies to any dependent source derived from `sources[from]`. There is no easy way
+ to type-check nor contract-check against that, so one has to be specially careful here. It is 
+ very easy to use a source derived at some location up the component tree, and then try to use that 
+ again down the `ForEach` component tree. This clumsy one still falls into that trap.
